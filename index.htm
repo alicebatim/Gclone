@@ -1,0 +1,193 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Cake Invaders</title>
+    <style>
+        body {
+            text-align: center;
+            background: #000;
+            color: white;
+            font-family: Arial, sans-serif;
+            overflow: hidden;
+        }
+        canvas {
+            background: black;
+            display: block;
+            margin: auto;
+            border: 2px solid white;
+        }
+        .controls {
+            position: fixed;
+            bottom: 10px;
+            width: 100%;
+            display: flex;
+            justify-content: center;
+            gap: 10px;
+        }
+        button {
+            width: 100px;
+            height: 100px;
+            font-size: 24px;
+            background: #444;
+            color: white;
+            border: none;
+            border-radius: 10px;
+        }
+        #scoreboard {
+            font-size: 20px;
+            margin-bottom: 10px;
+        }
+    </style>
+</head>
+<body>
+
+    <h1>Cake Invaders</h1>
+    <div id="scoreboard">Score: <span id="score">0</span> | High Score: <span id="highScore">0</span></div>
+    <canvas id="gameCanvas" width="400" height="500"></canvas>
+
+    <div class="controls">
+        <button id="left">⬅️</button>
+        <button id="fire">🔥</button>
+        <button id="right">➡️</button>
+    </div>
+
+    <audio id="shootSound" src="https://www.soundjay.com/button/beep-07.wav"></audio>
+    <audio id="explosionSound" src="https://www.soundjay.com/button/beep-05.wav"></audio>
+
+    <script>
+        const canvas = document.getElementById("gameCanvas");
+        const ctx = canvas.getContext("2d");
+
+        let score = 0;
+        let highScore = localStorage.getItem("highScore") || 0;
+        document.getElementById("highScore").textContent = highScore;
+
+        const player = {
+            x: canvas.width / 2 - 20,
+            y: canvas.height - 40,
+            width: 40,
+            height: 20,
+            speed: 5
+        };
+
+        const bullets = [];
+        let cakes = [];
+        const cakeRows = 3;
+        const cakeCols = 6;
+        let cakeDirection = 1;
+        let moveDown = false;
+
+        function createCakes() {
+            cakes = [];
+            for (let row = 0; row < cakeRows; row++) {
+                for (let col = 0; col < cakeCols; col++) {
+                    cakes.push({
+                        x: col * 60 + 30,
+                        y: row * 50 + 30,
+                        width: 40,
+                        height: 30,
+                        alive: true
+                    });
+                }
+            }
+        }
+
+        function drawPlayer() {
+            ctx.fillStyle = "white";
+            ctx.fillRect(player.x, player.y, player.width, player.height);
+        }
+
+        function drawBullets() {
+            ctx.fillStyle = "red";
+            bullets.forEach((bullet, index) => {
+                ctx.fillRect(bullet.x, bullet.y, 5, 10);
+                bullet.y -= 5;
+                if (bullet.y < 0) bullets.splice(index, 1);
+            });
+        }
+
+        function drawCakes() {
+            let edgeReached = false;
+            cakes.forEach(cake => {
+                if (cake.alive) {
+                    ctx.fillStyle = "pink";
+                    ctx.fillRect(cake.x, cake.y, cake.width, cake.height);
+                    ctx.fillStyle = "white";
+                    ctx.fillText("🍰", cake.x + 10, cake.y + 20);
+                    
+                    cake.x += cakeDirection * 2;
+                    if (cake.x + cake.width > canvas.width || cake.x < 0) {
+                        edgeReached = true;
+                    }
+                }
+            });
+
+            if (edgeReached) {
+                cakeDirection *= -1;
+                moveDown = true;
+            }
+
+            if (moveDown) {
+                cakes.forEach(cake => {
+                    if (cake.alive) cake.y += 10;
+                });
+                moveDown = false;
+            }
+        }
+
+        function checkCollisions() {
+            bullets.forEach((bullet, bulletIndex) => {
+                cakes.forEach((cake, cakeIndex) => {
+                    if (
+                        cake.alive &&
+                        bullet.x < cake.x + cake.width &&
+                        bullet.x + 5 > cake.x &&
+                        bullet.y < cake.y + cake.height &&
+                        bullet.y + 10 > cake.y
+                    ) {
+                        cake.alive = false;
+                        bullets.splice(bulletIndex, 1);
+                        document.getElementById("explosionSound").play();
+                        score += 10;
+                        document.getElementById("score").textContent = score;
+
+                        if (score > highScore) {
+                            highScore = score;
+                            localStorage.setItem("highScore", highScore);
+                            document.getElementById("highScore").textContent = highScore;
+                        }
+                    }
+                });
+            });
+        }
+
+        function update() {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            drawPlayer();
+            drawBullets();
+            drawCakes();
+            checkCollisions();
+            requestAnimationFrame(update);
+        }
+
+        document.getElementById("left").addEventListener("click", () => {
+            if (player.x > 0) player.x -= player.speed;
+        });
+
+        document.getElementById("right").addEventListener("click", () => {
+            if (player.x < canvas.width - player.width) player.x += player.speed;
+        });
+
+        document.getElementById("fire").addEventListener("click", () => {
+            bullets.push({ x: player.x + 18, y: player.y, speed: 5 });
+            document.getElementById("shootSound").play();
+        });
+
+        createCakes();
+        update();
+    </script>
+
+</body>
+</html>
