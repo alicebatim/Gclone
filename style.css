@@ -1,0 +1,93 @@
+body {
+  font-family: Arial, sans-serif;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  background-color: #000;
+  margin: 0;
+  padding: 20px;
+  color: white;
+}
+
+h1 {
+  margin-bottom: 10px;
+  color: white;
+}
+
+#scoreboard {
+  font-size: 18px;
+  margin-bottom: 10px;
+  color: #ccc;
+}
+
+canvas {
+  background-color: #111;
+  border: 2px solid #fff;
+  box-shadow: 0 0 10px rgba(255,255,255,0.2);
+}
+
+.controls {
+  margin-top: 20px;
+  display: flex;
+  gap: 20px;
+  flex-wrap: wrap;
+  justify-content: center;
+}
+
+button {
+  width: 120px;
+  height: 120px;
+  font-size: 32px;
+  font-weight: bold;
+  border: none;
+  border-radius: 16px;
+  cursor: pointer;
+  user-select: none;
+  touch-action: manipulation;
+  box-shadow: 0 4px 10px rgba(0,0,0,0.3);
+  transition: transform 0.1s ease;
+}
+
+button:active {
+  transform: scale(0.95);
+}
+
+#left, #right {
+  background-color: #28a745;
+  color: white;
+}
+
+#fire {
+  background-color: #dc3545;
+  color: white;
+}
+/* Container at bottom of screen */
+#mobileControls {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  width: 100%;
+  display: flex;              /* flexbox row */
+  flex-direction: row;        /* force horizontal layout */
+  margin: 0;
+  padding: 0;
+  gap: 0;                     /* no space between buttons */
+  z-index: 1000;
+}
+
+/* Buttons */
+#mobileControls button {
+  flex: 1;                    /* equal width for all buttons */
+  height: 60px;
+  margin: 0;                  /* remove default spacing */
+  padding: 0;
+  border: 1px solid #0f0;
+  background: rgba(0,0,0,0.7);
+  color: #0f0;
+  font-size: 18px;
+  font-family: monospace;
+  box-sizing: border-box;     /* include border in width */
+  cursor: pointer;
+  user-select: none;
+  touch-action: none;
+}
